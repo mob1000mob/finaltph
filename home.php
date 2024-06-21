@@ -1,11 +1,180 @@
-<?php include('./include/db.php'); 
-$query = "SELECT * FROM basic_setup,personal_setup,aboutus_setup";
-$runquery = mysqli_query($db,$query);
+<?php
+// Include the database connection file
+include('./include/db.php');
+
+// Check the database connection
 if(!$db){
-    header("location:index-2.html");
+    die("Connection failed: " . mysqli_connect_error());
+   
 }
+
+
+$query = "SELECT * FROM basic_setup, personal_setup, aboutus_setup";
+$runquery = mysqli_query($db, $query);
+
+if (!$runquery) {
+    die("Query failed: " . mysqli_error($db));
+    
+}
+
 $data = mysqli_fetch_array($runquery);
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title><?=$data['title']?></title>
+    <meta content="<?=$data['description']?>" name="description">
+    <meta content="<?=$data['keyword']?>" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/<?=$data['icon']?>" rel="icon">
+    <link href="assets/img/<?=$data['icon']?>" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+    <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <style>
+        #hero {
+            background: url(assets/img/<?=$data['homewallpaper']?>) center / cover no-repeat;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Mobile nav toggle button ======= -->
+    <button type="button" class="mobile-nav-toggle d-xl-none"><i class="icofont-navigation-menu"></i></button>
+
+    <!-- ======= Header ======= -->
+    <header id="header">
+        <div class="d-flex flex-column">
+            <div class="profile">
+                <img src="assets/img/<?=$data['profilepic']?>" alt="" class="img-fluid rounded-circle">
+                <h1 class="text-light"><a href="#"><?=$data['name']?></a></h1>
+                <div class="social-links mt-3 text-center">
+                    <?php if($data['twitter']!=""){ ?>
+                        <a href="<?=$data['twitter']?>" class="twitter"><i class="bx bxl-twitter"></i></a>
+                    <?php } if($data['facebook']!=""){ ?>
+                        <a href="<?=$data['facebook']?>" class="facebook"><i class="bx bxl-facebook"></i></a>
+                    <?php } if($data['instagram']!=""){ ?>
+                        <a href="<?=$data['instagram']?>" class="instagram"><i class="bx bxl-instagram"></i></a>
+                    <?php } if($data['skype']!=""){ ?>
+                        <a href="<?=$data['instagram']?>" class="google-plus"><i class="bx bxl-skype"></i></a>
+                    <?php } if($data['linkedin']!=""){ ?>
+                        <a href="<?=$data['linkedin']?>" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+                    <?php } if($data['github']!=""){ ?>
+                        <a href="<?=$data['instagram']?>" class="github"><i class="bx bxl-github"></i></a>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <ul>
+                    <li class=""><a href="#hero"><i class="bx bx-home"></i> <span>Home</span></a></li>
+                    <li><a href="#about"><i class="bx bx-user"></i> <span>About</span></a></li>
+                    <li><a href="#resume"><i class="bx bx-file-blank"></i> <span>Resume</span></a></li>
+                    <li><a href="#portfolio"><i class="bx bx-book-content"></i> Portfolio</a></li>
+                    <li><a href="#contact"><i class="bx bx-envelope"></i> Contact</a></li>
+                </ul>
+            </nav><!-- .nav-menu -->
+            <button type="button" class="mobile-nav-toggle d-xl-none"><i class="icofont-navigation-menu"></i></button>
+        </div>
+    </header><!-- End Header -->
+
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
+        <div class="hero-container" data-aos="fade-in">
+            <h1><?=$data['name']?></h1>
+            <p>I'm <span class="typed" data-typed-items="<?php
+                $prof = explode(",", $data['professions']);
+                foreach ($prof as $value) {
+                    echo $value . ",";
+                } ?>"></span></p>
+        </div>
+    </section><!-- End Hero -->
+
+    <main id="main">
+        <!-- ======= About Section ======= -->
+        <section id="about" class="about">
+            <div class="container">
+                <div class="section-title">
+                    <h2>About</h2>
+                    <p><?=$data['shortdesc']?></p>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4" data-aos="fade-right">
+                        <img src="assets/img/<?=$data['profilepic']?>" class="img-fluid" alt="">
+                    </div>
+                    <div class="col-lg-8 pt-4 pt-lg-0 content" data-aos="fade-left">
+                        <h3><?=$data['heading']?></h3>
+                        <p class="font-italic"><?=$data['subheading']?></p>
+                        <div>
+                            <ul class="row">
+                                <li class="col-lg-6"><i class="icofont-rounded-right"></i> <strong>Birthday :</strong> <?=$data['dob']?></li>
+                                <li class="col-lg-6"><i class="icofont-rounded-right"></i> <strong>Email :</strong> <?=$data['emailid']?></li>
+                                <li class="col-lg-5"><i class="icofont-rounded-right"></i> <strong>Mobile :</strong> <?=$data['mobile']?></li>
+                            </ul>
+                        </div>
+                        <p><?=$data['longdesc']?></p>
+                    </div>
+                </div>
+            </div>
+        </section><!-- End About Section -->
+
+        <!-- ======= Skills Section ======= -->
+        <section id="skills" class="skills section-bg">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Skills</h2>
+                </div>
+                <div class="row skills-content">
+                    <div class="row col-lg-12" data-aos="fade-up">
+                        <?php
+                        $query3 = "SELECT * FROM skills";
+                        $runquery3 = mysqli_query($db, $query3);
+                        while ($data3 = mysqli_fetch_array($runquery3)) { ?>
+                            <div class="progress col-lg-6">
+                                <span class="skill"><?=$data3['skill']?> <i class="val"><?=$data3['score']?>%</i></span>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="<?=$data3['score']?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        </section><!-- End Skills Section -->
+
+        <!-- ======= Resume Section ======= -->
+        <section id="resume" class="resume">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Resume</h2>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6" data-aos="fade-up">
+                        <h3 class="resume-title">Education</h3>
+                        <?php
+                        $query4 = "SELECT * FROM resume WHERE category='e'";
+                        $runquery4 = mysqli_query($db, $query4);
+           
+
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
