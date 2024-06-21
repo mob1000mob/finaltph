@@ -1,10 +1,29 @@
-<?php include('./include/db.php'); 
-$query = "SELECT * FROM basic_setup,personal_setup,aboutus_setup";
-$runquery = mysqli_query($db,$query);
-if(!$db){
+<?php
+
+$host = 'tphserver.mysql.database.azure.com';
+$username = 'tphadmin';
+$password = 'ThePortfolioHub123';
+$db_name = 'newserver';
+
+$conn = mysqli_init();
+mysqli_ssl_set($conn, NULL, NULL, "DigiCertGlobalRootCA.crt.pem", NULL, NULL);
+
+if (!mysqli_real_connect($conn, $host, $username, $password, $db_name, 3306, NULL, MYSQLI_CLIENT_SSL)) {
+    die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+}
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$query = "SELECT * FROM basic_setup, personal_setup, aboutus_setup";
+$runquery = mysqli_query($conn, $query);
+if (!$runquery) {
     header("location:index.html");
+    exit();
 }
 $data = mysqli_fetch_array($runquery);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -180,7 +199,7 @@ $data = mysqli_fetch_array($runquery);
                     <div class="row col-lg-12" data-aos="fade-up">
 <?php
                     $query3 = "SELECT * FROM skills";
-$runquery3= mysqli_query($db,$query3);
+$runquery3= mysqli_query($conn, $query3);
 while($data3=mysqli_fetch_array($runquery3)){
     ?>
                         <div class="progress col-lg-6">
@@ -212,42 +231,42 @@ while($data3=mysqli_fetch_array($runquery3)){
 
                 <div class="row">
                     <div class="col-lg-6" data-aos="fade-up">
-                        <h3 class="resume-title">Education</h3>
                         <?php
-                    $query4 = "SELECT * FROM resume WHERE category='e'";
-$runquery4= mysqli_query($db,$query4);
-while($data4=mysqli_fetch_array($runquery4)){
-    ?>
-                    <div class="resume-item">
-                            <h4><?=$data4['title']?></h4>
-                            <h5><?=$data4['year']?></h5>
-                            <p><em><?=$data4['ogname']?></em></p>
-                            <p><?=$data4['workdesc']?></p>
+                     $query2 = "SELECT * FROM resume";
+$runquery2= mysqli_query($conn, $query2);
+while($data2=mysqli_fetch_array($runquery2)){
+                        if($data2['type']=="left"){
+                            ?>
+                        <h3 class="resume-title"><?=$data2['heading']?></h3>
+                        <div class="resume-item">
+                            <h4><?=$data2['title']?></h4>
+                            <h5><?=$data2['date']?></h5>
+                            <p><em><?=$data2['subheading']?></em></p>
+                            <p><?=$data2['description']?></p>
                         </div>
-                                <?php
+                        <?php
+                        }
 }
-                    ?>
-                        
-                        
-                        
+                        ?>
                     </div>
                     <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-                        <h3 class="resume-title">Professional Experience</h3>
-                        
                         <?php
-                    $query4 = "SELECT * FROM resume WHERE category='pe'";
-$runquery4= mysqli_query($db,$query4);
-while($data4=mysqli_fetch_array($runquery4)){
-    ?>
-                    <div class="resume-item">
-                            <h4><?=$data4['title']?></h4>
-                            <h5><?=$data4['year']?></h5>
-                            <p><em><?=$data4['ogname']?></em></p>
-                            <p><?=$data4['workdesc']?></p>
+                    $query2 = "SELECT * FROM resume";
+$runquery2= mysqli_query($conn, $query2);
+while($data2=mysqli_fetch_array($runquery2)){
+                    if($data2['type']=="right"){
+                        ?>
+                        <h3 class="resume-title"><?=$data2['heading']?></h3>
+                        <div class="resume-item">
+                            <h4><?=$data2['title']?></h4>
+                            <h5><?=$data2['date']?></h5>
+                            <p><em><?=$data2['subheading']?></em></p>
+                            <p><?=$data2['description']?></p>
                         </div>
-                                <?php
+                        <?php
 }
-                    ?>
+                    }
+                        ?>
                     </div>
                 </div>
 
@@ -262,44 +281,91 @@ while($data4=mysqli_fetch_array($runquery4)){
                     <h2>Portfolio</h2>
                 </div>
 
+                <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-center" data-aos="fade-up">
+                        <ul id="portfolio-flters">
+                            <li data-filter="*" class="filter-active">All</li>
+                            <?php
+                       $query4 = "SELECT * FROM portfoliocategory";
+$runquery4= mysqli_query($conn, $query4);
+while($data4=mysqli_fetch_array($runquery4)){
+                            ?>
+                            <li data-filter=".filter-<?=$data4['category']?>"><?=$data4['category']?></li>
+                            <?php
+}
+                            ?>
+                        </ul>
+                    </div>
+                </div>
 
                 <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="100">
-
-                   <?php
-                    $query5 = "SELECT * FROM portfolio";
-$runquery5= mysqli_query($db,$query5);
-while($data5=mysqli_fetch_array($runquery5)){
-    ?>
-                  <div class="col-lg-4 col-md-6 portfolio-item">
+<?php
+                $query4 = "SELECT * FROM portfolio";
+$runquery4= mysqli_query($conn, $query4);
+while($data4=mysqli_fetch_array($runquery4)){
+                    ?>
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-<?=$data4['category']?>">
                         <div class="portfolio-wrap">
-                            <img src="assets/img/<?=$data5['projectpic']?>" class="img-fluid" alt="">
-                            <div class="portfolio-links" title="<?=$data5['projectname']?>">
-                                
-                                <a href="assets/img/<?=$data5['projectpic']?>" data-gall="portfolioGallery" class="venobox" title="App 1"><i class="bx bx-plus"></i></a>
-                                <a href="<?=$data5['projectlink']?>" target="_blank" title="Visit <?=$data5['projectname']?>"><i class="bx bx-link"></i></a>
+                            <img src="assets/img/<?=$data4['image']?>" class="img-fluid" alt="">
+                            <div class="portfolio-info">
+                                <h4><?=$data4['title']?></h4>
+                                <p><?=$data4['category']?></p>
+                                <div class="portfolio-links">
+                                    <a href="assets/img/<?=$data4['image']?>" data-gall="portfolioGallery" class="venobox" title="<?=$data4['title']?>"><i class="bx bx-plus"></i></a>
+                                    <a href="portfolio-details.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Portfolio Details"><i class="bx bx-link"></i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                                <?php
+                    <?php
 }
-                    ?>
+                ?>
                     
-
-                    
-                       
 
                 </div>
 
             </div>
         </section><!-- End Portfolio Section -->
 
-        
+        <!-- ======= Services Section ======= -->
+        <section id="services" class="services">
+            <div class="container">
+
+                <div class="section-title">
+                    <h2>Services</h2>
+                    <p><?=$data['servicesdesc']?></p>
+                </div>
+
+                <div class="row">
+<?php
+                $query5 = "SELECT * FROM services";
+$runquery5= mysqli_query($conn, $query5);
+while($data5=mysqli_fetch_array($runquery5)){
+                    ?>
+                    <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-up">
+                        <div class="icon-box">
+                            <div class="icon"><i class="<?=$data5['icon']?>"></i></div>
+                            <h4><a href=""><?=$data5['title']?></a></h4>
+                            <p><?=$data5['description']?></p>
+                        </div>
+                    </div>
+                    <?php
+}
+                ?>
+                    
+
+                </div>
+
+            </div>
+        </section><!-- End Services Section -->
+
         <!-- ======= Contact Section ======= -->
-        <section id="contact" class="contact">
+        <section id="contact" class="contact section-bg">
             <div class="container">
 
                 <div class="section-title">
                     <h2>Contact</h2>
+                    <p><?=$data['contactdesc']?></p>
                 </div>
 
                 <div class="row" data-aos="fade-in">
@@ -309,26 +375,28 @@ while($data5=mysqli_fetch_array($runquery5)){
                             <div class="address">
                                 <i class="icofont-google-map"></i>
                                 <h4>Location:</h4>
-                                <p><?=$data['location']?></p>
+                                <p><?=$data['address']?></p>
                             </div>
 
                             <div class="email">
                                 <i class="icofont-envelope"></i>
                                 <h4>Email:</h4>
-                                <p><a href="mailto:<?=$data['emailid']?>"><?=$data['emailid']?></a></p>
+                                <p><?=$data['contactemail']?></p>
                             </div>
 
                             <div class="phone">
                                 <i class="icofont-phone"></i>
                                 <h4>Call:</h4>
-                                <p><?=$data['mobile']?></p>
+                                <p><?=$data['contactmobile']?></p>
                             </div>
+
+                            <iframe src="<?=$data['map']?>" frameborder="0" style="border:0; width: 100%; height: 290px;" allowfullscreen></iframe>
                         </div>
 
                     </div>
 
                     <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-                        <form action="include/message.php" method="post" role="form" class="php-email-form">
+                        <form action="forms/contact.php" method="post" role="form" class="php-email-form">
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="name">Your Name</label>
@@ -348,20 +416,17 @@ while($data5=mysqli_fetch_array($runquery5)){
                             </div>
                             <div class="form-group">
                                 <label for="name">Message</label>
-                                <textarea class="form-control" name="message" id="message" rows="10" data-rule="required" data-msg="Please write something for us"></textarea>
+                                <textarea class="form-control" name="message" rows="10" data-rule="required" data-msg="Please write something for us"></textarea>
                                 <div class="validate"></div>
                             </div>
                             <div class="mb-3">
                                 <div class="loading">Loading</div>
-                                <div class="bg-success error-message"></div>
-                                <div class="sent-message"></div>
+                                <div class="error-message"></div>
+                                <div class="sent-message">Your message has been sent. Thank you!</div>
                             </div>
                             <div class="text-center"><button type="submit">Send Message</button></div>
                         </form>
                     </div>
-<!--
-                    
--->
 
                 </div>
 
@@ -373,21 +438,23 @@ while($data5=mysqli_fetch_array($runquery5)){
     <!-- ======= Footer ======= -->
     <footer id="footer">
         <div class="container">
-<!--
             <div class="copyright">
-                &copy; Copyright <strong><span>iPortfolio</span></strong>
+                &copy; Copyright <strong><span><?=$data['title']?></span></strong>
             </div>
--->
             <div class="credits">
-                Developed by <a href="#">Group 6</a>
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/iportfolio-bootstrap-portfolio-websites-template/ -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
             </div>
         </div>
-    </footer><!-- End  Footer -->
+    </footer><!-- End Footer -->
 
+    <div id="preloader"></div>
     <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
 
     <!-- Vendor JS Files -->
-    <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script src="assets/vendor/jquery/jquery.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
@@ -403,26 +470,6 @@ while($data5=mysqli_fetch_array($runquery5)){
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
 
-    <script>
-        if (window.self == window.top) {
-            (function(i, s, o, g, r, a, m) {
-                i['GoogleAnalyticsObject'] = r;
-                i[r] = i[r] || function() {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
-                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-                a.async = 1;
-                a.src = g;
-                m.parentNode.insertBefore(a, m)
-            })(window, document, 'script', '../../../../www.google-analytics.com/analytics.js', 'ga');
-            ga('create', 'UA-55234356-4', 'auto');
-            ga('send', 'pageview');
-        }
-
-    </script>
 </body>
-
-
-<!-- Mirrored from bootstrapmade.com/demo/themes/iPortfolio/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 16 May 2020 03:40:16 GMT -->
 
 </html>
