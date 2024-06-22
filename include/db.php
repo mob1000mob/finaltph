@@ -3,7 +3,7 @@
 $db_host = getenv('tphserver.mysql.database.azure.com');
 $db_user = getenv('tphadmin');
 $db_pass = getenv('ThePortfolioHub123');
-$db_name = getenv('newserver');
+$db_name = getenv('bagongserver');
 
 // Establish a connection to the database
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
